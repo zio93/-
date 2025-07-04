@@ -1,485 +1,521 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>생산성 허브</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide-react/0.263.1/umd/lucide-react.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-        }
-    </style>
-</head>
-<body>
-    <div id="root"></div>
+import React, { useState, useEffect } from 'react';
+import { Calendar, CheckCircle, Circle, Plus, Settings, Target, Clock, Flag, Home, List, BarChart3, User, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-        const { 
-            Calendar, CheckCircle, Circle, Plus, Settings, Target, Clock, Flag, 
-            Home, List, BarChart3, User, Search, Filter, ChevronLeft, ChevronRight 
-        } = lucide;
+const ProductivityApp = () => {
+  const [activeTab, setActiveTab] = useState('today');
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [tasks, setTasks] = useState([
+    { id: 1, title: 'Morning Run', time: '07:00', completed: false, category: 'health', priority: 'low', date: '2024-09-05' },
+    { id: 2, title: 'Interview Mr. Li', time: '09:00', completed: false, category: 'work', priority: 'high', date: '2024-09-05' },
+    { id: 3, title: 'Prepare Work Report', time: '13:00', completed: false, category: 'work', priority: 'high', date: '2024-09-05' },
+    { id: 4, title: 'Evening Reading', time: '22:00', completed: false, category: 'personal', priority: 'low', date: '2024-09-05' },
+    { id: 5, title: 'Check Work Emails', time: '', completed: false, category: 'work', priority: 'medium', date: '2024-09-06' },
+    { id: 6, title: 'Attend Meeting', time: '', completed: false, category: 'work', priority: 'high', date: '2024-09-06' },
+    { id: 7, title: 'Pick Up Package', time: '', completed: false, category: 'personal', priority: 'low', date: '2024-09-06' },
+  ]);
 
-        const ProductivityApp = () => {
-            const [activeTab, setActiveTab] = useState('today');
-            const [selectedDate, setSelectedDate] = useState(new Date());
-            const [tasks, setTasks] = useState([
-                { id: 1, title: '아침 운동', time: '07:00', completed: false, category: 'health', priority: 'low', date: '2024-09-05' },
-                { id: 2, title: '이씨와 인터뷰', time: '09:00', completed: false, category: 'work', priority: 'high', date: '2024-09-05' },
-                { id: 3, title: '업무 보고서 작성', time: '13:00', completed: false, category: 'work', priority: 'high', date: '2024-09-05' },
-                { id: 4, title: '저녁 독서', time: '22:00', completed: false, category: 'personal', priority: 'low', date: '2024-09-05' },
-                { id: 5, title: '업무 이메일 확인', time: '', completed: false, category: 'work', priority: 'medium', date: '2024-09-06' },
-                { id: 6, title: '회의 참석', time: '', completed: false, category: 'work', priority: 'high', date: '2024-09-06' },
-                { id: 7, title: '택배 수령', time: '', completed: false, category: 'personal', priority: 'low', date: '2024-09-06' },
-            ]);
+  const [habits, setHabits] = useState([
+    { id: 1, name: 'Run', icon: '🏃', streak: 64, missed: 0, completed: [true, true, true, true, false, false, true] },
+    { id: 2, name: 'Read', icon: '📚', streak: 26, missed: 13, completed: [true, true, true, true, true, false, true] },
+    { id: 3, name: 'Eat Breakfast', icon: '🍳', streak: 102, missed: 46, completed: [true, true, true, true, true, true, true] },
+    { id: 4, name: 'Eat Fruits', icon: '🍎', streak: 79, missed: 1, completed: [true, true, true, true, true, true, true] },
+    { id: 5, name: 'Eat Veggies', icon: '🥕', streak: 187, missed: 82, completed: [true, true, true, true, true, true, true] },
+    { id: 6, name: 'Exercise', icon: '💪', streak: 48, missed: 36, completed: [true, true, true, true, true, true, true] },
+  ]);
 
-            const [habits, setHabits] = useState([
-                { id: 1, name: '운동', icon: '🏃', streak: 64, missed: 0, completed: [true, true, true, true, false, false, true] },
-                { id: 2, name: '독서', icon: '📚', streak: 26, missed: 13, completed: [true, true, true, true, true, false, true] },
-                { id: 3, name: '아침식사', icon: '🍳', streak: 102, missed: 46, completed: [true, true, true, true, true, true, true] },
-                { id: 4, name: '과일 섭취', icon: '🍎', streak: 79, missed: 1, completed: [true, true, true, true, true, true, true] },
-                { id: 5, name: '채소 섭취', icon: '🥕', streak: 187, missed: 82, completed: [true, true, true, true, true, true, true] },
-                { id: 6, name: '운동', icon: '💪', streak: 48, missed: 36, completed: [true, true, true, true, true, true, true] },
-            ]);
+  const [projects, setProjects] = useState([
+    { id: 1, name: 'Product Launch', tasks: ['Project Kickoff', 'Submit Product', 'Follow Up on Feedback'], color: 'bg-blue-500' },
+    { id: 2, name: 'Design System', tasks: ['Design Research', 'UI Design', 'Design Review'], color: 'bg-cyan-500' },
+    { id: 3, name: 'Development', tasks: ['Technical Research', 'Develop Project'], color: 'bg-green-500' },
+    { id: 4, name: 'Operations', tasks: ['Prepare Operations', 'Event Planning'], color: 'bg-red-500' },
+    { id: 5, name: 'Testing', tasks: ['Test Plan', 'Test Case Design'], color: 'bg-yellow-500' },
+  ]);
 
-            const [projects, setProjects] = useState([
-                { id: 1, name: '제품 출시', tasks: ['프로젝트 시작', '제품 제출', '피드백 팔로우'], color: 'bg-blue-500' },
-                { id: 2, name: '디자인 시스템', tasks: ['디자인 연구', 'UI 디자인', '디자인 리뷰'], color: 'bg-cyan-500' },
-                { id: 3, name: '개발', tasks: ['기술 연구', '프로젝트 개발'], color: 'bg-green-500' },
-                { id: 4, name: '운영', tasks: ['운영 준비', '이벤트 기획'], color: 'bg-red-500' },
-                { id: 5, name: '테스트', tasks: ['테스트 계획', '테스트 케이스 설계'], color: 'bg-yellow-500' },
-            ]);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-            const [currentTime, setCurrentTime] = useState(new Date());
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-            useEffect(() => {
-                const timer = setInterval(() => {
-                    setCurrentTime(new Date());
-                }, 1000);
-                return () => clearInterval(timer);
-            }, []);
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('en-US', { 
+      hour12: false, 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  };
 
-            const formatTime = (date) => {
-                return date.toLocaleTimeString('ko-KR', { 
-                    hour12: false, 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                });
-            };
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
 
-            const formatDate = (date) => {
-                return date.toLocaleDateString('ko-KR', { 
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric'
-                });
-            };
+  const toggleTask = (id) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...task, completed: !task.completed } : task
+    ));
+  };
 
-            const toggleTask = (id) => {
-                setTasks(tasks.map(task => 
-                    task.id === id ? { ...task, completed: !task.completed } : task
-                ));
-            };
+  const toggleHabit = (habitId, dayIndex) => {
+    setHabits(habits.map(habit => {
+      if (habit.id === habitId) {
+        const newCompleted = [...habit.completed];
+        newCompleted[dayIndex] = !newCompleted[dayIndex];
+        return { ...habit, completed: newCompleted };
+      }
+      return habit;
+    }));
+  };
 
-            const toggleHabit = (habitId, dayIndex) => {
-                setHabits(habits.map(habit => {
-                    if (habit.id === habitId) {
-                        const newCompleted = [...habit.completed];
-                        newCompleted[dayIndex] = !newCompleted[dayIndex];
-                        return { ...habit, completed: newCompleted };
-                    }
-                    return habit;
-                }));
-            };
+  const getTodayTasks = () => {
+    const today = new Date().toISOString().split('T')[0];
+    return tasks.filter(task => task.date === today || task.date === '2024-09-05');
+  };
 
-            const getTodayTasks = () => {
-                const today = new Date().toISOString().split('T')[0];
-                return tasks.filter(task => task.date === today || task.date === '2024-09-05');
-            };
+  const getUpcomingTasks = () => {
+    const today = new Date().toISOString().split('T')[0];
+    return tasks.filter(task => task.date > today || task.date === '2024-09-06');
+  };
 
-            const getUpcomingTasks = () => {
-                const today = new Date().toISOString().split('T')[0];
-                return tasks.filter(task => task.date > today || task.date === '2024-09-06');
-            };
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'high': return 'text-red-500';
+      case 'medium': return 'text-orange-500';
+      case 'low': return 'text-green-500';
+      default: return 'text-gray-500';
+    }
+  };
 
-            const getPriorityColor = (priority) => {
-                switch (priority) {
-                    case 'high': return 'text-red-500';
-                    case 'medium': return 'text-orange-500';
-                    case 'low': return 'text-green-500';
-                    default: return 'text-gray-500';
-                }
-            };
+  const getCategoryColor = (category) => {
+    switch (category) {
+      case 'work': return 'bg-blue-100 text-blue-800';
+      case 'personal': return 'bg-green-100 text-green-800';
+      case 'health': return 'bg-purple-100 text-purple-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
 
-            const getCategoryColor = (category) => {
-                switch (category) {
-                    case 'work': return 'bg-blue-100 text-blue-800';
-                    case 'personal': return 'bg-green-100 text-green-800';
-                    case 'health': return 'bg-purple-100 text-purple-800';
-                    default: return 'bg-gray-100 text-gray-800';
-                }
-            };
+  const renderTodayView = () => (
+    <div className="space-y-6">
+      {/* Digital Clock */}
+      <div className="bg-gray-900 text-white p-6 rounded-2xl">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-4xl font-bold font-mono">{formatTime(currentTime)}</div>
+            <div className="text-gray-400 mt-1">{formatDate(currentTime)}</div>
+          </div>
+          <div className="text-right">
+            <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mb-2">
+              <span className="text-white text-xl">🍎</span>
+            </div>
+            <div className="text-sm text-gray-400">MON 10/14</div>
+          </div>
+        </div>
+      </div>
 
-            const renderTodayView = () => (
-                React.createElement('div', { className: 'space-y-6' },
-                    React.createElement('div', { className: 'bg-gray-900 text-white p-6 rounded-2xl' },
-                        React.createElement('div', { className: 'flex items-center justify-between' },
-                            React.createElement('div', null,
-                                React.createElement('div', { className: 'text-4xl font-bold font-mono' }, formatTime(currentTime)),
-                                React.createElement('div', { className: 'text-gray-400 mt-1' }, formatDate(currentTime))
-                            ),
-                            React.createElement('div', { className: 'text-right' },
-                                React.createElement('div', { className: 'w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mb-2' },
-                                    React.createElement('span', { className: 'text-white text-xl' }, '🍎')
-                                ),
-                                React.createElement('div', { className: 'text-sm text-gray-400' }, 'MON 10/14')
-                            )
-                        )
-                    )
-                ),
-                React.createElement('div', { className: 'p-6' },
-                    renderContent()
-                ),
-                React.createElement('div', { className: 'fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200' },
-                    React.createElement('div', { className: 'flex' },
-                        React.createElement('button', {
-                            onClick: () => setActiveTab('today'),
-                            className: `flex-1 flex flex-col items-center py-3 ${activeTab === 'today' ? 'text-blue-500' : 'text-gray-400'}`
-                        },
-                            React.createElement(Home, { className: 'w-5 h-5 mb-1' }),
-                            React.createElement('span', { className: 'text-xs' }, '오늘')
-                        ),
-                        React.createElement('button', {
-                            onClick: () => setActiveTab('tasks'),
-                            className: `flex-1 flex flex-col items-center py-3 ${activeTab === 'tasks' ? 'text-blue-500' : 'text-gray-400'}`
-                        },
-                            React.createElement(List, { className: 'w-5 h-5 mb-1' }),
-                            React.createElement('span', { className: 'text-xs' }, '작업')
-                        ),
-                        React.createElement('button', {
-                            onClick: () => setActiveTab('habits'),
-                            className: `flex-1 flex flex-col items-center py-3 ${activeTab === 'habits' ? 'text-blue-500' : 'text-gray-400'}`
-                        },
-                            React.createElement(Target, { className: 'w-5 h-5 mb-1' }),
-                            React.createElement('span', { className: 'text-xs' }, '습관')
-                        ),
-                        React.createElement('button', {
-                            onClick: () => setActiveTab('calendar'),
-                            className: `flex-1 flex flex-col items-center py-3 ${activeTab === 'calendar' ? 'text-blue-500' : 'text-gray-400'}`
-                        },
-                            React.createElement(Calendar, { className: 'w-5 h-5 mb-1' }),
-                            React.createElement('span', { className: 'text-xs' }, '달력')
-                        ),
-                        React.createElement('button', {
-                            onClick: () => setActiveTab('projects'),
-                            className: `flex-1 flex flex-col items-center py-3 ${activeTab === 'projects' ? 'text-blue-500' : 'text-gray-400'}`
-                        },
-                            React.createElement(BarChart3, { className: 'w-5 h-5 mb-1' }),
-                            React.createElement('span', { className: 'text-xs' }, '프로젝트')
-                        )
-                    )
-                )
+      {/* Today's Tasks */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">Today's Tasks</h2>
+          <span className="text-gray-500 text-sm">{getTodayTasks().length} tasks</span>
+        </div>
+        <div className="space-y-3">
+          {getTodayTasks().map(task => (
+            <div key={task.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <button onClick={() => toggleTask(task.id)}>
+                {task.completed ? (
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                ) : (
+                  <Circle className="w-5 h-5 text-gray-400" />
+                )}
+              </button>
+              <div className="flex-1">
+                <div className={`font-medium ${task.completed ? 'line-through text-gray-500' : ''}`}>
+                  {task.title}
+                </div>
+                <div className="flex items-center space-x-2 mt-1">
+                  {task.time && (
+                    <span className="text-sm text-gray-500">{task.time}</span>
+                  )}
+                  <span className={`text-xs px-2 py-1 rounded-full ${getCategoryColor(task.category)}`}>
+                    {task.category}
+                  </span>
+                </div>
+              </div>
+              <Flag className={`w-4 h-4 ${getPriorityColor(task.priority)}`} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white rounded-2xl p-4 shadow-sm">
+          <div className="text-2xl font-bold text-blue-600">
+            {tasks.filter(t => t.completed).length}
+          </div>
+          <div className="text-sm text-gray-600">Completed Today</div>
+        </div>
+        <div className="bg-white rounded-2xl p-4 shadow-sm">
+          <div className="text-2xl font-bold text-green-600">
+            {habits.filter(h => h.completed[4]).length}
+          </div>
+          <div className="text-sm text-gray-600">Habits Done</div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderTasksView = () => (
+    <div className="space-y-6">
+      {/* Eisenhower Matrix */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <h2 className="text-xl font-bold mb-4">Priority Matrix</h2>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-red-50 p-4 rounded-lg">
+            <div className="flex items-center space-x-2 mb-3">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              <span className="text-sm font-medium text-red-700">Urgent & Important</span>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Circle className="w-4 h-4 text-gray-400" />
+                <span className="text-sm">Prep Work Report</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Circle className="w-4 h-4 text-gray-400" />
+                <span className="text-sm">Join Project Meeting</span>
+              </div>
+            </div>
+          </div>
+          <div className="bg-yellow-50 p-4 rounded-lg">
+            <div className="flex items-center space-x-2 mb-3">
+              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+              <span className="text-sm font-medium text-yellow-700">Not Urgent & Important</span>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Circle className="w-4 h-4 text-gray-400" />
+                <span className="text-sm">Create Work Plan</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Circle className="w-4 h-4 text-gray-400" />
+                <span className="text-sm">Attend Weekly Meeting</span>
+              </div>
+            </div>
+          </div>
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="flex items-center space-x-2 mb-3">
+              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+              <span className="text-sm font-medium text-blue-700">Urgent & Unimportant</span>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Circle className="w-4 h-4 text-gray-400" />
+                <span className="text-sm">Respond to Client Calls</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Circle className="w-4 h-4 text-gray-400" />
+                <span className="text-sm">Check Work Emails</span>
+              </div>
+            </div>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg">
+            <div className="flex items-center space-x-2 mb-3">
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span className="text-sm font-medium text-green-700">Not Urgent & Unimportant</span>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Circle className="w-4 h-4 text-gray-400" />
+                <span className="text-sm">Morning Run</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Circle className="w-4 h-4 text-gray-400" />
+                <span className="text-sm">Book a Flight</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Task Categories */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <h2 className="text-xl font-bold mb-4">Task Categories</h2>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="text-center p-4 bg-blue-50 rounded-lg">
+            <div className="text-2xl font-bold text-blue-600">91</div>
+            <div className="text-sm text-gray-600">Work Tasks</div>
+          </div>
+          <div className="text-center p-4 bg-green-50 rounded-lg">
+            <div className="text-2xl font-bold text-green-600">37</div>
+            <div className="text-sm text-gray-600">Personal</div>
+          </div>
+          <div className="text-center p-4 bg-purple-50 rounded-lg">
+            <div className="text-2xl font-bold text-purple-600">14</div>
+            <div className="text-sm text-gray-600">Health</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderHabitsView = () => (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <h2 className="text-xl font-bold mb-4">Weekly Habits</h2>
+        <div className="space-y-4">
+          {habits.map(habit => (
+            <div key={habit.id} className="border-b border-gray-100 pb-4 last:border-0">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-3">
+                  <span className="text-2xl">{habit.icon}</span>
+                  <div>
+                    <div className="font-medium">{habit.name}</div>
+                    <div className="text-sm text-gray-500">
+                      🔥 {habit.streak} Days • 💔 {habit.missed} Days
+                    </div>
+                  </div>
+                </div>
+                <CheckCircle className="w-5 h-5 text-green-500" />
+              </div>
+              <div className="flex space-x-2">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
+                  <button
+                    key={index}
+                    onClick={() => toggleHabit(habit.id, index)}
+                    className={`w-8 h-8 rounded-full text-xs font-medium ${
+                      habit.completed[index] 
+                        ? 'bg-blue-500 text-white' 
+                        : 'bg-gray-200 text-gray-600'
+                    }`}
+                  >
+                    {day[0]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderCalendarView = () => (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">September 2024</h2>
+          <div className="flex items-center space-x-2">
+            <button className="p-2 hover:bg-gray-100 rounded-lg">
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button className="p-2 hover:bg-gray-100 rounded-lg">
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-7 gap-1 mb-4">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+            <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
+              {day}
+            </div>
+          ))}
+        </div>
+        
+        <div className="grid grid-cols-7 gap-1">
+          {Array.from({ length: 35 }, (_, i) => {
+            const date = i - 2; // Start from 1st (adjusting for Sunday start)
+            const isToday = date === 5;
+            const hasEvents = [3, 5, 6, 8, 12, 14, 21].includes(date);
+            
+            return (
+              <div
+                key={i}
+                className={`h-12 flex items-center justify-center text-sm relative ${
+                  date < 1 || date > 30 
+                    ? 'text-gray-300' 
+                    : isToday 
+                      ? 'bg-blue-500 text-white rounded-lg font-bold' 
+                      : 'hover:bg-gray-100 rounded-lg'
+                }`}
+              >
+                {date > 0 && date <= 30 && date}
+                {hasEvents && (
+                  <div className="absolute bottom-1 w-1 h-1 bg-blue-500 rounded-full"></div>
+                )}
+              </div>
             );
-        };
+          })}
+        </div>
+      </div>
 
-        ReactDOM.render(React.createElement(ProductivityApp), document.getElementById('root'));
-    </script>
-</body>
-</html>,
-                    React.createElement('div', { className: 'bg-white rounded-2xl p-6 shadow-sm' },
-                        React.createElement('div', { className: 'flex items-center justify-between mb-4' },
-                            React.createElement('h2', { className: 'text-xl font-bold' }, '오늘의 할 일'),
-                            React.createElement('span', { className: 'text-gray-500 text-sm' }, getTodayTasks().length, '개 작업')
-                        ),
-                        React.createElement('div', { className: 'space-y-3' },
-                            getTodayTasks().map(task => (
-                                React.createElement('div', { key: task.id, className: 'flex items-center space-x-3 p-3 bg-gray-50 rounded-lg' },
-                                    React.createElement('button', { onClick: () => toggleTask(task.id) },
-                                        task.completed ? 
-                                            React.createElement(CheckCircle, { className: 'w-5 h-5 text-green-500' }) :
-                                            React.createElement(Circle, { className: 'w-5 h-5 text-gray-400' })
-                                    ),
-                                    React.createElement('div', { className: 'flex-1' },
-                                        React.createElement('div', { className: `font-medium ${task.completed ? 'line-through text-gray-500' : ''}` }, task.title),
-                                        React.createElement('div', { className: 'flex items-center space-x-2 mt-1' },
-                                            task.time && React.createElement('span', { className: 'text-sm text-gray-500' }, task.time),
-                                            React.createElement('span', { className: `text-xs px-2 py-1 rounded-full ${getCategoryColor(task.category)}` }, task.category)
-                                        )
-                                    ),
-                                    React.createElement(Flag, { className: `w-4 h-4 ${getPriorityColor(task.priority)}` })
-                                )
-                            ))
-                        )
-                    ),
-                    React.createElement('div', { className: 'grid grid-cols-2 gap-4' },
-                        React.createElement('div', { className: 'bg-white rounded-2xl p-4 shadow-sm' },
-                            React.createElement('div', { className: 'text-2xl font-bold text-blue-600' }, tasks.filter(t => t.completed).length),
-                            React.createElement('div', { className: 'text-sm text-gray-600' }, '오늘 완료')
-                        ),
-                        React.createElement('div', { className: 'bg-white rounded-2xl p-4 shadow-sm' },
-                            React.createElement('div', { className: 'text-2xl font-bold text-green-600' }, habits.filter(h => h.completed[4]).length),
-                            React.createElement('div', { className: 'text-sm text-gray-600' }, '습관 완료')
-                        )
-                    )
-                )
-            );
+      {/* Upcoming Events */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <h3 className="text-lg font-bold mb-4">Upcoming Events</h3>
+        <div className="space-y-3">
+          <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+            <div>
+              <div className="font-medium">Interview Mr. Li</div>
+              <div className="text-sm text-gray-500">Sep 5 • 09:00</div>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <div>
+              <div className="font-medium">Prepare Work Report</div>
+              <div className="text-sm text-gray-500">Sep 5 • 13:00</div>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3 p-3 bg-purple-50 rounded-lg">
+            <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+            <div>
+              <div className="font-medium">Attend Meeting</div>
+              <div className="text-sm text-gray-500">Sep 6 • All Day</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
-            const renderTasksView = () => (
-                React.createElement('div', { className: 'space-y-6' },
-                    React.createElement('div', { className: 'bg-white rounded-2xl p-6 shadow-sm' },
-                        React.createElement('h2', { className: 'text-xl font-bold mb-4' }, '우선순위 매트릭스'),
-                        React.createElement('div', { className: 'grid grid-cols-2 gap-4' },
-                            React.createElement('div', { className: 'bg-red-50 p-4 rounded-lg' },
-                                React.createElement('div', { className: 'flex items-center space-x-2 mb-3' },
-                                    React.createElement('div', { className: 'w-3 h-3 bg-red-500 rounded-full' }),
-                                    React.createElement('span', { className: 'text-sm font-medium text-red-700' }, '긴급 & 중요')
-                                ),
-                                React.createElement('div', { className: 'space-y-2' },
-                                    React.createElement('div', { className: 'flex items-center space-x-2' },
-                                        React.createElement(Circle, { className: 'w-4 h-4 text-gray-400' }),
-                                        React.createElement('span', { className: 'text-sm' }, '업무 보고서 작성')
-                                    ),
-                                    React.createElement('div', { className: 'flex items-center space-x-2' },
-                                        React.createElement(Circle, { className: 'w-4 h-4 text-gray-400' }),
-                                        React.createElement('span', { className: 'text-sm' }, '프로젝트 회의 참석')
-                                    )
-                                )
-                            ),
-                            React.createElement('div', { className: 'bg-yellow-50 p-4 rounded-lg' },
-                                React.createElement('div', { className: 'flex items-center space-x-2 mb-3' },
-                                    React.createElement('div', { className: 'w-3 h-3 bg-yellow-500 rounded-full' }),
-                                    React.createElement('span', { className: 'text-sm font-medium text-yellow-700' }, '중요 & 덜 긴급')
-                                ),
-                                React.createElement('div', { className: 'space-y-2' },
-                                    React.createElement('div', { className: 'flex items-center space-x-2' },
-                                        React.createElement(Circle, { className: 'w-4 h-4 text-gray-400' }),
-                                        React.createElement('span', { className: 'text-sm' }, '업무 계획 수립')
-                                    ),
-                                    React.createElement('div', { className: 'flex items-center space-x-2' },
-                                        React.createElement(Circle, { className: 'w-4 h-4 text-gray-400' }),
-                                        React.createElement('span', { className: 'text-sm' }, '주간 회의 참석')
-                                    )
-                                )
-                            ),
-                            React.createElement('div', { className: 'bg-blue-50 p-4 rounded-lg' },
-                                React.createElement('div', { className: 'flex items-center space-x-2 mb-3' },
-                                    React.createElement('div', { className: 'w-3 h-3 bg-blue-500 rounded-full' }),
-                                    React.createElement('span', { className: 'text-sm font-medium text-blue-700' }, '긴급 & 덜 중요')
-                                ),
-                                React.createElement('div', { className: 'space-y-2' },
-                                    React.createElement('div', { className: 'flex items-center space-x-2' },
-                                        React.createElement(Circle, { className: 'w-4 h-4 text-gray-400' }),
-                                        React.createElement('span', { className: 'text-sm' }, '고객 전화 응답')
-                                    ),
-                                    React.createElement('div', { className: 'flex items-center space-x-2' },
-                                        React.createElement(Circle, { className: 'w-4 h-4 text-gray-400' }),
-                                        React.createElement('span', { className: 'text-sm' }, '업무 이메일 확인')
-                                    )
-                                )
-                            ),
-                            React.createElement('div', { className: 'bg-green-50 p-4 rounded-lg' },
-                                React.createElement('div', { className: 'flex items-center space-x-2 mb-3' },
-                                    React.createElement('div', { className: 'w-3 h-3 bg-green-500 rounded-full' }),
-                                    React.createElement('span', { className: 'text-sm font-medium text-green-700' }, '덜 긴급 & 덜 중요')
-                                ),
-                                React.createElement('div', { className: 'space-y-2' },
-                                    React.createElement('div', { className: 'flex items-center space-x-2' },
-                                        React.createElement(Circle, { className: 'w-4 h-4 text-gray-400' }),
-                                        React.createElement('span', { className: 'text-sm' }, '아침 운동')
-                                    ),
-                                    React.createElement('div', { className: 'flex items-center space-x-2' },
-                                        React.createElement(Circle, { className: 'w-4 h-4 text-gray-400' }),
-                                        React.createElement('span', { className: 'text-sm' }, '항공편 예약')
-                                    )
-                                )
-                            )
-                        )
-                    ),
-                    React.createElement('div', { className: 'bg-white rounded-2xl p-6 shadow-sm' },
-                        React.createElement('h2', { className: 'text-xl font-bold mb-4' }, '작업 카테고리'),
-                        React.createElement('div', { className: 'grid grid-cols-3 gap-4' },
-                            React.createElement('div', { className: 'text-center p-4 bg-blue-50 rounded-lg' },
-                                React.createElement('div', { className: 'text-2xl font-bold text-blue-600' }, '91'),
-                                React.createElement('div', { className: 'text-sm text-gray-600' }, '업무 작업')
-                            ),
-                            React.createElement('div', { className: 'text-center p-4 bg-green-50 rounded-lg' },
-                                React.createElement('div', { className: 'text-2xl font-bold text-green-600' }, '37'),
-                                React.createElement('div', { className: 'text-sm text-gray-600' }, '개인')
-                            ),
-                            React.createElement('div', { className: 'text-center p-4 bg-purple-50 rounded-lg' },
-                                React.createElement('div', { className: 'text-2xl font-bold text-purple-600' }, '14'),
-                                React.createElement('div', { className: 'text-sm text-gray-600' }, '건강')
-                            )
-                        )
-                    )
-                )
-            );
+  const renderProjectsView = () => (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <h2 className="text-xl font-bold mb-4">Project Timeline</h2>
+        <div className="space-y-4">
+          {projects.map(project => (
+            <div key={project.id} className="border-l-4 border-blue-500 pl-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-3 h-3 rounded-full ${project.color}`}></div>
+                  <span className="font-medium">{project.name}</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </div>
+              <div className="mt-2 space-y-1">
+                {project.tasks.map((task, index) => (
+                  <div key={index} className="text-sm text-gray-600 pl-6">
+                    • {task}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-            const renderHabitsView = () => (
-                React.createElement('div', { className: 'space-y-6' },
-                    React.createElement('div', { className: 'bg-white rounded-2xl p-6 shadow-sm' },
-                        React.createElement('h2', { className: 'text-xl font-bold mb-4' }, '주간 습관'),
-                        React.createElement('div', { className: 'space-y-4' },
-                            habits.map(habit => (
-                                React.createElement('div', { key: habit.id, className: 'border-b border-gray-100 pb-4 last:border-0' },
-                                    React.createElement('div', { className: 'flex items-center justify-between mb-2' },
-                                        React.createElement('div', { className: 'flex items-center space-x-3' },
-                                            React.createElement('span', { className: 'text-2xl' }, habit.icon),
-                                            React.createElement('div', null,
-                                                React.createElement('div', { className: 'font-medium' }, habit.name),
-                                                React.createElement('div', { className: 'text-sm text-gray-500' }, `🔥 ${habit.streak}일 • 💔 ${habit.missed}일`)
-                                            )
-                                        ),
-                                        React.createElement(CheckCircle, { className: 'w-5 h-5 text-green-500' })
-                                    ),
-                                    React.createElement('div', { className: 'flex space-x-2' },
-                                        ['일', '월', '화', '수', '목', '금', '토'].map((day, index) => (
-                                            React.createElement('button', {
-                                                key: index,
-                                                onClick: () => toggleHabit(habit.id, index),
-                                                className: `w-8 h-8 rounded-full text-xs font-medium ${habit.completed[index] ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`
-                                            }, day)
-                                        ))
-                                    )
-                                )
-                            ))
-                        )
-                    )
-                )
-            );
+      {/* Project Stats */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white rounded-2xl p-4 shadow-sm">
+          <div className="text-2xl font-bold text-blue-600">5</div>
+          <div className="text-sm text-gray-600">Active Projects</div>
+        </div>
+        <div className="bg-white rounded-2xl p-4 shadow-sm">
+          <div className="text-2xl font-bold text-green-600">23</div>
+          <div className="text-sm text-gray-600">Tasks Completed</div>
+        </div>
+      </div>
+    </div>
+  );
 
-            const renderCalendarView = () => (
-                React.createElement('div', { className: 'space-y-6' },
-                    React.createElement('div', { className: 'bg-white rounded-2xl p-6 shadow-sm' },
-                        React.createElement('div', { className: 'flex items-center justify-between mb-4' },
-                            React.createElement('h2', { className: 'text-xl font-bold' }, '2024년 9월'),
-                            React.createElement('div', { className: 'flex items-center space-x-2' },
-                                React.createElement('button', { className: 'p-2 hover:bg-gray-100 rounded-lg' },
-                                    React.createElement(ChevronLeft, { className: 'w-5 h-5' })
-                                ),
-                                React.createElement('button', { className: 'p-2 hover:bg-gray-100 rounded-lg' },
-                                    React.createElement(ChevronRight, { className: 'w-5 h-5' })
-                                )
-                            )
-                        ),
-                        React.createElement('div', { className: 'grid grid-cols-7 gap-1 mb-4' },
-                            ['일', '월', '화', '수', '목', '금', '토'].map(day => (
-                                React.createElement('div', { key: day, className: 'text-center text-sm font-medium text-gray-500 py-2' }, day)
-                            ))
-                        ),
-                        React.createElement('div', { className: 'grid grid-cols-7 gap-1' },
-                            Array.from({ length: 35 }, (_, i) => {
-                                const date = i - 2;
-                                const isToday = date === 5;
-                                const hasEvents = [3, 5, 6, 8, 12, 14, 21].includes(date);
-                                
-                                return React.createElement('div', {
-                                    key: i,
-                                    className: `h-12 flex items-center justify-center text-sm relative ${date < 1 || date > 30 ? 'text-gray-300' : isToday ? 'bg-blue-500 text-white rounded-lg font-bold' : 'hover:bg-gray-100 rounded-lg'}`
-                                },
-                                    date > 0 && date <= 30 && date,
-                                    hasEvents && React.createElement('div', { className: 'absolute bottom-1 w-1 h-1 bg-blue-500 rounded-full' })
-                                );
-                            })
-                        )
-                    ),
-                    React.createElement('div', { className: 'bg-white rounded-2xl p-6 shadow-sm' },
-                        React.createElement('h3', { className: 'text-lg font-bold mb-4' }, '다가오는 이벤트'),
-                        React.createElement('div', { className: 'space-y-3' },
-                            React.createElement('div', { className: 'flex items-center space-x-3 p-3 bg-blue-50 rounded-lg' },
-                                React.createElement('div', { className: 'w-3 h-3 bg-blue-500 rounded-full' }),
-                                React.createElement('div', null,
-                                    React.createElement('div', { className: 'font-medium' }, '이씨와 인터뷰'),
-                                    React.createElement('div', { className: 'text-sm text-gray-500' }, '9월 5일 • 09:00')
-                                )
-                            ),
-                            React.createElement('div', { className: 'flex items-center space-x-3 p-3 bg-green-50 rounded-lg' },
-                                React.createElement('div', { className: 'w-3 h-3 bg-green-500 rounded-full' }),
-                                React.createElement('div', null,
-                                    React.createElement('div', { className: 'font-medium' }, '업무 보고서 작성'),
-                                    React.createElement('div', { className: 'text-sm text-gray-500' }, '9월 5일 • 13:00')
-                                )
-                            ),
-                            React.createElement('div', { className: 'flex items-center space-x-3 p-3 bg-purple-50 rounded-lg' },
-                                React.createElement('div', { className: 'w-3 h-3 bg-purple-500 rounded-full' }),
-                                React.createElement('div', null,
-                                    React.createElement('div', { className: 'font-medium' }, '회의 참석'),
-                                    React.createElement('div', { className: 'text-sm text-gray-500' }, '9월 6일 • 하루 종일')
-                                )
-                            )
-                        )
-                    )
-                )
-            );
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'today': return renderTodayView();
+      case 'tasks': return renderTasksView();
+      case 'habits': return renderHabitsView();
+      case 'calendar': return renderCalendarView();
+      case 'projects': return renderProjectsView();
+      default: return renderTodayView();
+    }
+  };
 
-            const renderProjectsView = () => (
-                React.createElement('div', { className: 'space-y-6' },
-                    React.createElement('div', { className: 'bg-white rounded-2xl p-6 shadow-sm' },
-                        React.createElement('h2', { className: 'text-xl font-bold mb-4' }, '프로젝트 타임라인'),
-                        React.createElement('div', { className: 'space-y-4' },
-                            projects.map(project => (
-                                React.createElement('div', { key: project.id, className: 'border-l-4 border-blue-500 pl-4' },
-                                    React.createElement('div', { className: 'flex items-center justify-between' },
-                                        React.createElement('div', { className: 'flex items-center space-x-3' },
-                                            React.createElement('div', { className: `w-3 h-3 rounded-full ${project.color}` }),
-                                            React.createElement('span', { className: 'font-medium' }, project.name)
-                                        ),
-                                        React.createElement(ChevronRight, { className: 'w-4 h-4 text-gray-400' })
-                                    ),
-                                    React.createElement('div', { className: 'mt-2 space-y-1' },
-                                        project.tasks.map((task, index) => (
-                                            React.createElement('div', { key: index, className: 'text-sm text-gray-600 pl-6' }, `• ${task}`)
-                                        ))
-                                    )
-                                )
-                            ))
-                        )
-                    ),
-                    React.createElement('div', { className: 'grid grid-cols-2 gap-4' },
-                        React.createElement('div', { className: 'bg-white rounded-2xl p-4 shadow-sm' },
-                            React.createElement('div', { className: 'text-2xl font-bold text-blue-600' }, '5'),
-                            React.createElement('div', { className: 'text-sm text-gray-600' }, '활성 프로젝트')
-                        ),
-                        React.createElement('div', { className: 'bg-white rounded-2xl p-4 shadow-sm' },
-                            React.createElement('div', { className: 'text-2xl font-bold text-green-600' }, '23'),
-                            React.createElement('div', { className: 'text-sm text-gray-600' }, '완료된 작업')
-                        )
-                    )
-                )
-            );
+  return (
+    <div className="max-w-md mx-auto bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="bg-white px-6 py-4 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold">P</span>
+            </div>
+            <div>
+              <h1 className="text-lg font-bold">Productivity Hub</h1>
+              <p className="text-sm text-gray-500">Stay organized & focused</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Search className="w-5 h-5 text-gray-400" />
+            <Settings className="w-5 h-5 text-gray-400" />
+          </div>
+        </div>
+      </div>
 
-            const renderContent = () => {
-                switch (activeTab) {
-                    case 'today': return renderTodayView();
-                    case 'tasks': return renderTasksView();
-                    case 'habits': return renderHabitsView();
-                    case 'calendar': return renderCalendarView();
-                    case 'projects': return renderProjectsView();
-                    default: return renderTodayView();
-                }
-            };
+      {/* Content */}
+      <div className="p-6">
+        {renderContent()}
+      </div>
 
-            return React.createElement('div', { className: 'max-w-md mx-auto bg-gray-50 min-h-screen' },
-                React.createElement('div', { className: 'bg-white px-6 py-4 shadow-sm' },
-                    React.createElement('div', { className: 'flex items-center justify-between' },
-                        React.createElement('div', { className: 'flex items-center space-x-3' },
-                            React.createElement('div', { className: 'w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center' },
-                                React.createElement('span', { className: 'text-white font-bold' }, 'P')
-                            ),
-                            React.createElement('div', null,
-                                React.createElement('h1', { className: 'text-lg font-bold' }, '생산성 허브'),
-                                React.createElement('p', { className: 'text-sm text-gray-500' }, '체계적이고 집중된 생활')
-                            )
-                        ),
-                        React.createElement('div', { className: 'flex items-center space-x-2' },
-                            React.createElement(Search, { className: 'w-5 h-5 text-gray-400' }),
-                            React.createElement(Settings, { className: 'w-5 h-5 text-gray-400' })
-                        )
-                    )
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200">
+        <div className="flex">
+          <button
+            onClick={() => setActiveTab('today')}
+            className={`flex-1 flex flex-col items-center py-3 ${
+              activeTab === 'today' ? 'text-blue-500' : 'text-gray-400'
+            }`}
+          >
+            <Home className="w-5 h-5 mb-1" />
+            <span className="text-xs">Today</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('tasks')}
+            className={`flex-1 flex flex-col items-center py-3 ${
+              activeTab === 'tasks' ? 'text-blue-500' : 'text-gray-400'
+            }`}
+          >
+            <List className="w-5 h-5 mb-1" />
+            <span className="text-xs">Tasks</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('habits')}
+            className={`flex-1 flex flex-col items-center py-3 ${
+              activeTab === 'habits' ? 'text-blue-500' : 'text-gray-400'
+            }`}
+          >
+            <Target className="w-5 h-5 mb-1" />
+            <span className="text-xs">Habits</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('calendar')}
+            className={`flex-1 flex flex-col items-center py-3 ${
+              activeTab === 'calendar' ? 'text-blue-500' : 'text-gray-400'
+            }`}
+          >
+            <Calendar className="w-5 h-5 mb-1" />
+            <span className="text-xs">Calendar</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('projects')}
+            className={`flex-1 flex flex-col items-center py-3 ${
+              activeTab === 'projects' ? 'text-blue-500' : 'text-gray-400'
+            }`}
+          >
+            <BarChart3 className="w-5 h-5 mb-1" />
+            <span className="text-xs">Projects</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProductivityApp;
